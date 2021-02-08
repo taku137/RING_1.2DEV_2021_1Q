@@ -30,6 +30,7 @@ When you install OpenCV3.1.0, then suddenly check dirs bellow:
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
+#include <time.h>
 #include <opencv2/highgui/highgui_c.h>
 #include "ring.h"
 
@@ -96,7 +97,7 @@ int main(void){
   gnInit(R_MODE);
   
 //画像ファイルの読込み
-  img=cvLoadImage("input.tiff",CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+  img=cvLoadImage("sample.bmp",CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
   width=img->width;
   height=img->height;
   area=width*height;
@@ -169,6 +170,10 @@ int main(void){
     printf("CHECKER: RGB: 2: INPUT-DONE\n");                       /* CHECKER */
     cvReleaseImage(&img);
   }
+/*  No. 1 
+    STRAT 
+*/
+long start_1 = clock();
 
   //鮮鋭化処理
   if(bit == 8){
@@ -228,7 +233,15 @@ if(bit == 8){
     cvSaveImage("out_RGB.bmp",img,0);
     cvReleaseImage(&img);
 }
-  
+
+long end_1 = clock();
+/*  No. 1 
+    END 
+*/
+
+const double time = (double)(end_1-start_1)/(CLOCKS_PER_SEC);
+printf("CPU TIME :  %f\n",time);
+
 //領域開放
   if(bit == 8){
     free(g_in);
