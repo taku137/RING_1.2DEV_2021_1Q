@@ -82,8 +82,6 @@ void __RGB2YUV(double* YUV, double R, double G, double B)
 void __YUV2RGB(double* RGB, double Y)
 {
   RGB[0] = 1.000 * Y ;
-  RGB[1] = 1.000 * Y ;
-  RGB[2] = 1.000 * Y ;
 }
 ////main 関数
 int main(void){
