@@ -1,6 +1,6 @@
  /*
  ============================================================================
- DATE    : 2021, 5th Feburary.
+ DATE    : 2021,8th Feburary.
  ============================================================================
  */
 
@@ -61,25 +61,29 @@ void YUV2RGB(double* RGB, double Y, double U, double V)
   RGB[1] = 1.164 * Y - 0.392 * U - 0.813 * V;
   RGB[2] = 1.164 * Y + 2.017 * U;
 }
-void _RGB2YUV(double* Y, double R, double G, double B)
+// Trans
+void _RGB2YUV(double* YUV, double R, double G, double B)
 {
-  Y[0] =  0.257 * R + 0.504 * G + 0.098 * B +  16;
+  YUV[0] =  0.299 * R + 0.587 * G + 0.114 * B;
+  YUV[1] = -0.169 * R - 0.331 * G + 0.500 * B;
+  YUV[2] =  0.500 * R - 0.419 * G - 0.081 * B;
 }
-void _YUV2RGB(double* R, double Y, double U, double V)
+void _YUV2RGB(double* RGB, double Y, double U, double V)
 {
-  Y -= 16;
-  U -= 128;
-  V -= 128;
-  R[0] = 1.164 * Y             + 1.596 * V;
-  R[1] = 1.164 * Y - 0.392 * U - 0.813 * V;
-  R[2] = 1.164 * Y + 2.017 * U;
+  RGB[0] = 1.000 * Y             + 1.402 * V;
+  RGB[1] = 1.000 * Y - 0.344 * U - 0.714 * V;
+  RGB[2] = 1.000 * Y + 1.772 * U;
 }
-void __YUV2RGB(double* R, double Y)
+// Trans
+void __RGB2YUV(double* YUV, double R, double G, double B)
 {
-  Y -= 16;
-  R[0] = 1.164 * Y;
-  R[1] = 1.164 * Y;
-  R[2] = 1.164 * Y;
+  YUV[0] =  0.299 * R + 0.587 * G + 0.114 * B;
+}
+void __YUV2RGB(double* RGB, double Y)
+{
+  RGB[0] = 1.000 * Y ;
+  RGB[1] = 1.000 * Y ;
+  RGB[2] = 1.000 * Y ;
 }
 ////main 関数
 int main(void){
@@ -209,7 +213,7 @@ long start_1 = clock();
     RGB=(double*)malloc(sizeof(double)*3);
     for(j=0;j<height;j++){
       for(i=0;i<width;i++){
-        RGB2YUV(YUV,R_in[i+j*width],G_in[i+j*width],B_in[i+j*width]);
+        _RGB2YUV(YUV,R_in[i+j*width],G_in[i+j*width],B_in[i+j*width]);
         Y_in[i+j*width] = YUV[0];
         U_in[i+j*width] = YUV[1];
         V_in[i+j*width] = YUV[2];
@@ -219,7 +223,7 @@ long start_1 = clock();
     printf("CHECKER: RGB: 3: FINISH Deconvolution.\n");                       /* CHECKER */
     for(j=0;j<height;j++){
       for(i=0;i<width;i++){
-        YUV2RGB(RGB,Y_out[i+j*width],U_in[i+j*width],V_in[i+j*width]);
+        _YUV2RGB(RGB,Y_out[i+j*width],U_in[i+j*width],V_in[i+j*width]);
         R_out[i+j*width] = RGB[0];
         G_out[i+j*width] = RGB[1];
         B_out[i+j*width] = RGB[2];
@@ -278,7 +282,7 @@ long start_2 = clock();
     RGB=(double*)malloc(sizeof(double)*3);
     for(j=0;j<height;j++){
       for(i=0;i<width;i++){
-        _RGB2YUV(YUV,R_in[i+j*width],G_in[i+j*width],B_in[i+j*width]);
+        __RGB2YUV(YUV,R_in[i+j*width],G_in[i+j*width],B_in[i+j*width]);
         Y_in[i+j*width] = YUV[0];
       }
     }
@@ -288,8 +292,8 @@ long start_2 = clock();
       for(i=0;i<width;i++){
         __YUV2RGB(RGB,Y_out[i+j*width]-Y_in[i+j*width]);
         R_out[i+j*width] = R_in[i+j*width]+RGB[0];
-        G_out[i+j*width] = G_in[i+j*width]+RGB[1];
-        B_out[i+j*width] = B_in[i+j*width]+RGB[2];
+        G_out[i+j*width] = G_in[i+j*width]+RGB[0];
+        B_out[i+j*width] = B_in[i+j*width]+RGB[0];
       }
     }
   }
